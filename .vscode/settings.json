@@ -1,0 +1,9 @@
+{
+    "cSpell.words": [
+        "corsheaders",
+        "dotenv"
+    ],
+    "python.envFile": "${workspaceFolder}/backend/.env",
+    "mypy.runUsingActiveInterpreter": true,
+    
+}
