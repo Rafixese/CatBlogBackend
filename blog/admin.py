@@ -1,3 +1,17 @@
 from django.contrib import admin
 
-# Register your models here.
+from blog.models import Post, Tag
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'published_date', 'slug')
+    search_fields = ('title', 'content')
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('published_date', 'tags')
+    date_hierarchy = 'published_date'
+    filter_horizontal = ('tags',)
