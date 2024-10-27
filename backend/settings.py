@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 3600  # Enable HSTS
+    SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+    SESSION_COOKIE_SECURE = True  # Use secure cookies
+    CSRF_COOKIE_SECURE = True    # Use secure CSRF cookies
+else:
+    # Ensure these are disabled in development
+    SECURE_HSTS_SECONDS = 0
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
