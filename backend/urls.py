@@ -19,10 +19,14 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 from django.conf.urls.static import static
 from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView
 
 urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path('admin/', admin.site.urls),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/blog/', include('blog.urls')), 
+    path('api/adminauth/', include('adminauth.urls')), 
 ]
 
 if settings.DEBUG:

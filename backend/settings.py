@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_ckeditor_5',
     'blog',
+    'drf_spectacular',
+    'adminauth',
 ]
 
 MIDDLEWARE = [
@@ -105,6 +107,20 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',  # Optional, for testing with credentials
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # This is the default Django backend
+]
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
 
 
 # Internationalization
