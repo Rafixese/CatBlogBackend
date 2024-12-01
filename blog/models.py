@@ -14,6 +14,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
+    image = models.ImageField()
     content = CKEditor5Field()
     slug = models.SlugField(max_length=200, unique=True)
     published_date = models.DateTimeField(default=timezone.now)
