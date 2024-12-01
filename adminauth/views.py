@@ -4,13 +4,14 @@ from rest_framework import status
 from django.http import JsonResponse
 from .serializers import LoginSerializer
 from drf_spectacular.utils import extend_schema
+from rest_framework.request import Request
 
 @extend_schema(
     request=LoginSerializer,  # Document request body structure
     responses={200: None},    # Define response codes (optional)
 )
 @api_view(['POST'])
-def login_view(request):
+def login_view(request: Request) -> JsonResponse:
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
         username = serializer.validated_data['username']

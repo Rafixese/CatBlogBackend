@@ -9,7 +9,7 @@ from .models import Tag, Post, Comment
 
 
 class BlogAPITestCase(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         # Create an admin user
         self.admin_user = User.objects.create_superuser(
             username='admin', email='admin@example.com', password='password'
@@ -43,69 +43,69 @@ class BlogAPITestCase(APITestCase):
         self.comment_detail_url = reverse('comment-detail', kwargs={'pk': self.comment.pk})
 
     # TagViewSet Tests
-    def test_tag_list_guest(self):
+    def test_tag_list_guest(self) -> None:
         response = self.client.get(self.tag_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tag_retrieve_guest(self):
+    def test_tag_retrieve_guest(self) -> None:
         response = self.client.get(self.tag_detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tag_create_guest(self):
+    def test_tag_create_guest(self) -> None:
         data = {'name': 'NewTag'}
         response = self.client.post(self.tag_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_tag_update_guest(self):
+    def test_tag_update_guest(self) -> None:
         data = {'name': 'UpdatedTag'}
         response = self.client.put(self.tag_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_tag_delete_guest(self):
+    def test_tag_delete_guest(self) -> None:
         response = self.client.delete(self.tag_detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_tag_create_admin(self):
+    def test_tag_create_admin(self) -> None:
         self.client.login(username='admin', password='password')
         data = {'name': 'AdminTag'}
         response = self.client.post(self.tag_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_tag_update_admin(self):
+    def test_tag_update_admin(self) -> None:
         self.client.login(username='admin', password='password')
         data = {'name': 'AdminUpdatedTag'}
         response = self.client.put(self.tag_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tag_delete_admin(self):
+    def test_tag_delete_admin(self) -> None:
         self.client.login(username='admin', password='password')
         response = self.client.delete(self.tag_detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     # PostViewSet Tests
-    def test_post_list_guest(self):
+    def test_post_list_guest(self) -> None:
         response = self.client.get(self.post_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_retrieve_guest(self):
+    def test_post_retrieve_guest(self) -> None:
         response = self.client.get(self.post_detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_create_guest(self):
+    def test_post_create_guest(self) -> None:
         data = {'title': 'Guest Post', 'content': 'Content', 'slug': 'guest-post'}
         response = self.client.post(self.post_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_post_update_guest(self):
+    def test_post_update_guest(self) -> None:
         data = {'title': 'Updated Guest Post', 'content': 'Updated Content', 'slug': 'test-post'}
         response = self.client.put(self.post_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_post_delete_guest(self):
+    def test_post_delete_guest(self) -> None:
         response = self.client.delete(self.post_detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_post_create_admin(self):
+    def test_post_create_admin(self) -> None:
         self.client.login(username='admin', password='password')
         data = {
             'title': 'Admin Post',
@@ -115,7 +115,7 @@ class BlogAPITestCase(APITestCase):
         response = self.client.post(self.post_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_post_update_admin(self):
+    def test_post_update_admin(self) -> None:
         self.client.login(username='admin', password='password')
         data = {
             'title': 'Updated Admin Post',
@@ -125,21 +125,21 @@ class BlogAPITestCase(APITestCase):
         response = self.client.put(self.post_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_delete_admin(self):
+    def test_post_delete_admin(self) -> None:
         self.client.login(username='admin', password='password')
         response = self.client.delete(self.post_detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     # CommentViewSet Tests
-    def test_comment_list_guest(self):
+    def test_comment_list_guest(self) -> None:
         response = self.client.get(self.comment_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_comment_retrieve_guest(self):
+    def test_comment_retrieve_guest(self) -> None:
         response = self.client.get(self.comment_detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_comment_create_guest(self):
+    def test_comment_create_guest(self) -> None:
         data = {
             'author': 'GuestUser',
             'content': 'New Comment Content',
@@ -148,7 +148,7 @@ class BlogAPITestCase(APITestCase):
         response = self.client.post(self.comment_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_comment_update_guest(self):
+    def test_comment_update_guest(self) -> None:
         data = {
             'author': 'GuestUser',
             'content': 'Updated Comment Content',
@@ -157,11 +157,11 @@ class BlogAPITestCase(APITestCase):
         response = self.client.put(self.comment_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_comment_delete_guest(self):
+    def test_comment_delete_guest(self) -> None:
         response = self.client.delete(self.comment_detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_comment_update_admin(self):
+    def test_comment_update_admin(self) -> None:
         self.client.login(username='admin', password='password')
         data = {
             'author': 'AdminUser',
@@ -171,7 +171,7 @@ class BlogAPITestCase(APITestCase):
         response = self.client.put(self.comment_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_comment_delete_admin(self):
+    def test_comment_delete_admin(self) -> None:
         self.client.login(username='admin', password='password')
         response = self.client.delete(self.comment_detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

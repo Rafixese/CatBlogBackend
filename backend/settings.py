@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'blog',
     'drf_spectacular',
     'adminauth',
+    'django.contrib.postgres',
 ]
 
 MIDDLEWARE = [
@@ -84,8 +85,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'cdblog',
+        'USER': 'sa',
+        'PASSWORD': os.getenv("POSTGRE_DB_USER_PASSWORD"),
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
