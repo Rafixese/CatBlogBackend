@@ -38,8 +38,15 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
+    # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    
+    def get_queryset(self) -> QuerySet:
+        post_pk = self.kwargs.get('post_pk')
+        if post_pk is not None:
+            return Comment.objects.filter(post_id=post_pk)
+        else:
+            return Comment.objects.none()
 
     def get_permissions(self) -> list[BasePermission]:
         if self.action in ['create', 'list', 'retrieve']:
