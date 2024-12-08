@@ -1,4 +1,5 @@
 from typing import cast
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, status
 
 from blog.models import Tag, Post, Comment
@@ -6,6 +7,8 @@ from blog.serializers import TagSerializer, CommentSerializer, PostSerializer
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from rest_framework.permissions import BasePermission
 from django.db.models.query import QuerySet
+from rest_framework.serializers import BaseSerializer
+
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
@@ -20,6 +23,7 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    lookup_field = 'slug'
 
     def get_permissions(self) -> list[BasePermission]:
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -42,9 +46,9 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     
     def get_queryset(self) -> QuerySet:
-        post_pk = self.kwargs.get('post_pk')
-        if post_pk is not None:
-            return Comment.objects.filter(post_id=post_pk)
+        post_slug = self.kwargs.get('post_slug')
+        if post_slug is not None:
+            return Comment.objects.filter(post__slug=post_slug)
         else:
             return Comment.objects.none()
 
@@ -54,3 +58,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         elif self.action in ['update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()]
         return cast(list[BasePermission], super().get_permissions()) 
+    
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        post_slug = self.kwargs.get('post_slug')
+        post = get_object_or_404(Post, slug=post_slug)
+        serializer.save(post=post)

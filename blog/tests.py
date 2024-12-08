@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from .models import Tag, Post, Comment
 
@@ -37,10 +38,16 @@ class BlogAPITestCase(APITestCase):
         self.tag_detail_url = reverse('tag-detail', kwargs={'pk': self.tag.pk})
 
         self.post_list_url = reverse('post-list')
-        self.post_detail_url = reverse('post-detail', kwargs={'pk': self.post.pk})
+        self.post_detail_url = reverse(
+            'post-detail', kwargs={'slug': self.post.slug})  # Use 'slug'
 
-        self.comment_list_url = reverse('comment-list')
-        self.comment_detail_url = reverse('comment-detail', kwargs={'pk': self.comment.pk})
+        self.comment_list_url = reverse(
+            # Nested URL
+            'post-comments-list', kwargs={'post_slug': self.post.slug})
+        self.comment_detail_url = reverse(
+            'post-comments-detail',
+            kwargs={'post_slug': self.post.slug, 'pk': self.comment.pk}
+        )  # Nested URL
 
     # TagViewSet Tests
     def test_tag_list_guest(self) -> None:
@@ -92,12 +99,14 @@ class BlogAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_create_guest(self) -> None:
-        data = {'title': 'Guest Post', 'content': 'Content', 'slug': 'guest-post'}
+        data = {'title': 'Guest Post',
+                'content': 'Content', 'slug': 'guest-post'}
         response = self.client.post(self.post_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_update_guest(self) -> None:
-        data = {'title': 'Updated Guest Post', 'content': 'Updated Content', 'slug': 'test-post'}
+        data = {'title': 'Updated Guest Post',
+                'content': 'Updated Content', 'slug': 'test-post'}
         response = self.client.put(self.post_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -107,22 +116,38 @@ class BlogAPITestCase(APITestCase):
 
     def test_post_create_admin(self) -> None:
         self.client.login(username='admin', password='password')
+        image = SimpleUploadedFile(
+            name='test_image.jpg',
+            content=b'\x47\x49\x46\x38\x39\x61\x02\x00\x01\x00\x80\x00\x00\x00\x00\x00\xFF\xFF\xFF\x21\xF9\x04\x01\x0A\x00\x01\x00\x2C\x00\x00\x00\x00\x02\x00\x01\x00\x00\x02\x02\x4C\x01\x00\x3B',
+            content_type='image/jpeg'
+        )
         data = {
             'title': 'Admin Post',
             'content': 'Admin Content',
             'slug': 'admin-post',
+            'image': image,
         }
         response = self.client.post(self.post_list_url, data)
+        if response.status_code != status.HTTP_201_CREATED:
+            print("Create Post Admin Response Data:", response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_update_admin(self) -> None:
         self.client.login(username='admin', password='password')
+        image = SimpleUploadedFile(
+            name='test_image.jpg',
+            content=b'\x47\x49\x46\x38\x39\x61\x02\x00\x01\x00\x80\x00\x00\x00\x00\x00\xFF\xFF\xFF\x21\xF9\x04\x01\x0A\x00\x01\x00\x2C\x00\x00\x00\x00\x02\x00\x01\x00\x00\x02\x02\x4C\x01\x00\x3B',
+            content_type='image/jpeg'
+        )
         data = {
             'title': 'Updated Admin Post',
             'content': 'Updated Admin Content',
             'slug': 'test-post',
+            'image': image
         }
         response = self.client.put(self.post_detail_url, data)
+        if response.status_code != status.HTTP_200_OK:
+            print("Update Post Admin Response Data:", response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_delete_admin(self) -> None:
@@ -143,7 +168,7 @@ class BlogAPITestCase(APITestCase):
         data = {
             'author': 'GuestUser',
             'content': 'New Comment Content',
-            'post': self.post.id,
+            # 'post': self.post.slug,  # Removed as post is set via URL
         }
         response = self.client.post(self.comment_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -152,7 +177,7 @@ class BlogAPITestCase(APITestCase):
         data = {
             'author': 'GuestUser',
             'content': 'Updated Comment Content',
-            'post': self.post.id,
+            # 'post': self.post.slug,  # Removed as post is set via URL
         }
         response = self.client.put(self.comment_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -166,7 +191,7 @@ class BlogAPITestCase(APITestCase):
         data = {
             'author': 'AdminUser',
             'content': 'Admin Updated Comment',
-            'post': self.post.id,
+            # 'post': self.post.slug,  # Removed as post is set via URL
         }
         response = self.client.put(self.comment_detail_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

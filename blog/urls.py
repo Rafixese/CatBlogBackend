@@ -7,8 +7,8 @@ from blog.views import TagViewSet, PostViewSet, CommentViewSet
 
 # Create a router and register your viewsets
 router = DefaultRouter()
-router.register(r'tags', TagViewSet)
-router.register(r'posts', PostViewSet)
+router.register(r'tags', TagViewSet, basename='tag')
+router.register(r'posts', PostViewSet, basename='post')
 # router.register(r'comments', CommentViewSet)
 
 posts_router = routers.NestedDefaultRouter(router, r'posts', lookup='post')
